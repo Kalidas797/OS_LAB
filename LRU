@@ -1,0 +1,61 @@
+#include <stdio.h>
+
+int findLRU(int time[], int frames) {
+    int i, minIndex = 0;
+    for (i = 1; i < frames; i++) {
+        if (time[i] < time[minIndex])
+            minIndex = i;
+    }
+    return minIndex;
+}
+
+int main() {
+    int frames, pages, i, j, pageFaults = 0, time[10], counter = 0;
+
+    printf("Enter the number of frames: ");
+    scanf("%d", &frames);
+
+    printf("Enter the number of pages: ");
+    scanf("%d", &pages);
+
+    int pageArray[pages], frameArray[frames];
+
+    printf("Enter the page reference sequence: ");
+    for (i = 0; i < pages; i++)
+        scanf("%d", &pageArray[i]);
+
+    for (i = 0; i < frames; i++)
+        frameArray[i] = -1;  // Initialize frames as empty
+
+    printf("\nPage Replacement Process:\n");
+
+    for (i = 0; i < pages; i++) {
+        int found = 0;
+
+        // Check if the page is already in a frame
+        for (j = 0; j < frames; j++) {
+            if (frameArray[j] == pageArray[i]) {
+                found = 1;
+                time[j] = counter++;  // Update usage time
+                break;
+            }
+        }
+
+        // If page is not found, replace the LRU page
+        if (!found) {
+            int replaceIndex = (i < frames) ? i : findLRU(time, frames);
+            frameArray[replaceIndex] = pageArray[i];
+            time[replaceIndex] = counter++;  // Store time of use
+            pageFaults++;
+
+            // Display frames after replacement
+            printf("Page %d -> Frames: ", pageArray[i]);
+            for (j = 0; j < frames; j++)
+                printf("%d ", frameArray[j]);
+            printf("\n");
+        }
+    }
+
+    printf("\nTotal Page Faults: %d\n", pageFaults);
+    return 0;
+}
